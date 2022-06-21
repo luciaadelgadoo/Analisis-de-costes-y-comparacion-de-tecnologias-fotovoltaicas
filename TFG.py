@@ -32,7 +32,7 @@ if datos == "e": # Elección valores específicos
      
 ############# COSTES DE INSTALACIÓN Y SUPOSICIONES ########################################################################################
 
-    nombre_inst = input("¿Cuál es el tamaño de la instalación? (Residencial, Comercial, Gran instalación fija o con seguimiento): ")
+    nombre_inst = input("Se consideran cuatro tipos de instalaciones: Residencial, Comercial, Gran instalación fija o con seguimiento: ")
     BOS_area = float(input("Coste del BOS area [$/W]: "))
     BOS_pot = float(input("Coste del BOS potencia [$/W]: "))
     labor = float(input("Coste de la mano de obra (labor) [$/W]: "))
