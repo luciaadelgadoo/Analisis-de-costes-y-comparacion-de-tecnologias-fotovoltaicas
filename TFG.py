@@ -22,7 +22,7 @@ if datos == "e": # Elección valores específicos
     G_STC = 1000 #Irradiancia en CEM [W/m^2]
         
     nombre_tec = input("¿Qué tecnología se utiliza en los módulos? (PERC, PERT, SHJ, IBC...): ")
-    nombre_proceso = input("¿Con qué proceso? (monocristalino, multicristalino): ")
+    nombre_proceso = input("¿Con qué tipo de oblea? (monocristalino, multicristalino): ")
 
     A = float(input("Área de un módulo [m2]: "))
     cost_mod = float(input("Coste del módulo en [$/W]: "))
