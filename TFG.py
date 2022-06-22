@@ -6,9 +6,6 @@ import numpy as np
 
 print("Bienvenido, este programa calcula el LCOE de una instalación fotovoltaica")
 
-#print("¿Quiere hacer una comparación o un único cálculo? \n Comparación = c \n único cálculo = u")
-#operacion = input("")
-
 print("¿Qué datos va a utilizar? \n Defecto = d \n Específicos = e")
 datos = input("")
 
@@ -16,23 +13,21 @@ if datos == "e": # Elección valores específicos
 
     print('Recuerde que en Python los números decimales se indican con el separador "." en vez de ","')
 
-
 ############# TIPO DE TECNOLOGÍA Y CARACTERÍSTICAS DE LOS MÓDULOS ##############################################################################
 
     G_STC = 1000 #Irradiancia en CEM [W/m^2]
         
     nombre_tec = input("¿Qué tecnología se utiliza en los módulos? (PERC, PERT, SHJ, IBC...): ")
-    nombre_proceso = input("¿Con qué tipo de oblea? (monocristalino, multicristalino): ")
+    nombre_proceso = input("¿Con qué proceso? (monocristalino, multicristalino): ")
 
     A = float(input("Área de un módulo [m2]: "))
     cost_mod = float(input("Coste del módulo en [$/W]: "))
     Pmod = float(input("Potencia nominal de cada módulo en [W]: "))
-
-    n = Pmod/(A*G_STC) #eficiencia del módulo
+    n = Pmod/(A*G_STC)
      
 ############# COSTES DE INSTALACIÓN Y SUPOSICIONES ########################################################################################
 
-    nombre_inst = input("Se consideran cuatro tipos de instalaciones: Residencial, Comercial, Gran instalación fija o con seguimiento: ")
+    nombre_inst = input("¿Cuál es el tamaño de la instalación? (Residencial, Comercial, Gran instalación fija o con seguimiento): ")
     BOS_area = float(input("Coste del BOS area [$/W]: "))
     BOS_pot = float(input("Coste del BOS potencia [$/W]: "))
     labor = float(input("Coste de la mano de obra (labor) [$/W]: "))
@@ -49,7 +44,7 @@ if datos == "e": # Elección valores específicos
 
     Degradacion = float(input("Degradación [%]: "))
     Degr = Degradacion/100
-    
+
     c_A = cost_mod + BOS_area
 
 ############# DATOS DEL MÓDULO (área, número, potencia) ########################################################################################
@@ -59,13 +54,13 @@ if datos == "e": # Elección valores específicos
 
     CTM = 1
 
-    cost_area = c_A*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con el área [$]
+    CoO_area = c_A*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con el área [$]
     
     c_P = (inv/ILR) + BOS_pot
     
-    cost_pot = c_P*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con la potencia [$]
+    CoO_pot = c_P*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con la potencia [$]
     
-    CoO = cost_area + cost_pot #Cost of Ownership [$]
+    CoO = CoO_area + CoO_pot #Cost of Ownership [$]
 
 ############# ASUNTOS FINANCIEROS: WACC ########################################################################################
     
@@ -106,40 +101,57 @@ if datos == "e": # Elección valores específicos
 ############# INFO POR CONSOLA ########################################################################################
 
     print ("--------    --------    --------    --------    --------    --------")
-    print ("DESGLOSE DE PARÁMETROS ESCOGIDOS")
+    print ("DESGLOSE DE PARÁMETROS")
+    print ("--------    --------    --------    --------    --------    --------")
+    print("Eficiencia del módulo: ", n*100,"%")
+    print("Área del módulo: ", A, "m^2")
+    print("Número de módulos: ", num_mod, "módulos")
+    print("Potencia nominal del sistema: ", P_STC, "kW")
+    print("WACC nominal = ", WACCnom, "%")
+    print("WACC real = ", WACCreal, "%")
+    print ("Años útiles del sistema fotovoltaico a implantar: ", años, "años")
+    print("Degradación = ", round(Degr*100, 3), "%")
+    print ("Inflación anual: ", Infl*100, "%")
+
+    print ("--------    --------    --------    --------    --------    --------")
+    print ("Costes de inversión o costes fijos")
     print ("--------    --------    --------    --------    --------    --------")
 
-    print("Eficiencia del módulo: ", n*100,"%")
+    print("Coste de mano de obra, labor: ", labor, "$/W")
+    print("Otros costes de inversión: ", otros, "$/W")
     print("Coste total del módulo: ", cost_mod, "$/W")
     print("BOS estructural: ", BOS_area, "$/W")
     print("BOS eléctrico: ", BOS_pot, "$/W")
     print("Coste del inversor: ", inv, "$/W")
-    print("Costes de operación y mantenimiento anuales: ", a, "$/W al año")
-    print("P* = ", P_STC, "KWp")
-    print("WACCnom = ", WACCnom, "%")
-    print("Degradación = ", round(Degr*100, 3), "%")
-    print("Coste de mano de obra: ", labor, "$")
-    print("Área del módulo: ", A, "m^2")
-    print("Costes totales relacionados con el área: ", cost_area, "$")
-    print("Costes totales relacionados con la potencia: ", cost_pot, "$")    
-    print ("Inflación anual: ", Infl*100, "%")
-    print ("Años útiles del sistema fotovoltaico a implantar: ", años, "años")
-    print("Costes totales de operación y mantenimiento teniendo en cuenta el WACCreal: ", cost_oym, "$/W")
+
+    print("Costes totales relacionados con el área, CoO_area: ", CoO_area, "$/W")
+    print("Costes totales relacionados con la potencia, CoO_potencia: ", CoO_pot, "$/W")
+    print("CoO total: ", CoO_area+CoO_pot, "$/W")
+    print("Costes totales de inversión, I0: ", labor+otros+CoO_area+CoO_pot, "$/W")
+
+    print ("--------    --------    --------    --------    --------    --------")
+    print ("Costes variables o costes de operación y mantenimiento")
+    print ("--------    --------    --------    --------    --------    --------")
+
+    print("Costes de O y M del año inicial: ", a, "$/W-año")
+    print("Costes totales de O y M teniendo en cuenta el WACCreal y los años de vida: ", cost_oym, "$/W")
+
+    print ("--------    --------    --------    --------    --------    --------")
+    print ("Energía generada")
+    print ("--------    --------    --------    --------    --------    --------")
+
+    print("Performance Ratio, PR: ", PR)
     print("Irradiación anual: ", G_t, "KWh/m^2")
-    print("PR: ", PR)
+
     print("Cantidad de electricidad producida anual: ", m, "KWh/año")
-    print("Cantidad total de energía producida teniendo en cuenta la degradación anual y el WACCreal: ", energ, "KWh/año")
+    print("Cantidad total de energía producida teniendo en cuenta la degradación, el WACC y los años de vida: ", energ, "KWh/año")
 
 ############# LCOE ########################################################################################
 
-    print ("----  --------  --------  --------  --------  --------  --------  ----")
     lcoe = (labor + otros + CoO + cost_oym)/energ
-    print ("labor + otros + CoO + cost_oym:", labor, "+", otros,"+", CoO,"+ (", cost_area, "+", cost_pot ,") =", labor + otros + CoO + cost_oym)
-    print ("SEGUN EL EXCEL cost_area:", cost_area +labor + otros)
-    print ("c_A, c_P:", c_A, c_P)
 
     print ("#######################################################################")
-    print("###################### Valor del LCOE:", lcoe, "$/KWh")
+    print("################ Valor del LCOE:", lcoe, "$/KWh ##########")
     print ("#######################################################################")
 
 ############################################################################################################################################
@@ -166,7 +178,7 @@ elif datos == "d": # Elección valores por defecto
             Pmod = float(input("Introduzca el valor de la potencia nominal de cada módulo en W: "))
         else:
             print("Lo introducido no es correcto.")
-        n = Pmod/(A*G_STC) #eficiencia del módulo
+        n =  Pmod/(A*G_STC) #0.174120 #eficiencia del módulo = Pmod/(A*G_STC) no está con fórmula para poder realizar el estudio de sensibilidad
 
     elif conv_cel_pais == "2": # elección Mono PERC
         nombre_tec = "PERC"
@@ -181,7 +193,7 @@ elif datos == "d": # Elección valores por defecto
             Pmod = float(input("Introduzca el valor de la potencia nominal de cada módulo en W: "))
         else:
             print("Lo introducido no es correcto.")
-        n = Pmod/(A*G_STC)
+        n =  Pmod/(A*G_STC) #0.189394 #eficiencia del módulo = Pmod/(A*G_STC) no está con fórmula para poder realizar el estudio de sensibilidad
 
     elif conv_cel_pais == "3": # elección multi PERC
         nombre_tec = "Multi PERC"
@@ -196,7 +208,7 @@ elif datos == "d": # Elección valores por defecto
             Pmod = float(input("Introduzca el valor de la potencia nominal de cada módulo en W: "))
         else:
             print("Lo introducido no es correcto.")
-        n = Pmod/(A*G_STC)
+        n = Pmod/(A*G_STC) #0.180230 #eficiencia del módulo = Pmod/(A*G_STC) no está con fórmula para poder realizar el estudio de sensibilidad
         
     elif conv_cel_pais == "4": # elección PERT bifacial mono
         nombre_tec = "PERT bifacial"
@@ -211,7 +223,7 @@ elif datos == "d": # Elección valores por defecto
             Pmod = float(input("Introduzca el valor de la potencia nominal de cada módulo en W: "))
         else:
             print("Lo introducido no es correcto.")
-        n = Pmod/(A*G_STC)
+        n = Pmod/(A*G_STC) #0.180230 #eficiencia del módulo = Pmod/(A*G_STC) no está con fórmula para poder realizar el estudio de sensibilidad
         
     elif conv_cel_pais == "5": # elección SHJ bifacial mono
         nombre_tec = "SHJ bifacial"
@@ -226,7 +238,7 @@ elif datos == "d": # Elección valores por defecto
             Pmod = float(input("Introduzca el valor de la potencia nominal de cada módulo en W: "))
         else:
             print("Lo introducido no es correcto.")
-        n = Pmod/(A*G_STC)
+        n = Pmod/(A*G_STC) #0.198558 #eficiencia del módulo = Pmod/(A*G_STC) no está con fórmula para poder realizar el estudio de sensibilidad
         
     elif conv_cel_pais == "6": # elección IBC mono
         nombre_tec = "IBC"
@@ -241,7 +253,7 @@ elif datos == "d": # Elección valores por defecto
             Pmod = float(input("Introduzca el valor de la potencia nominal de cada módulo en W: "))
         else:
             print("Lo introducido no es correcto.")
-        n = Pmod/(A*G_STC)
+        n = Pmod/(A*G_STC) #0.201613
     else:
         print("Lo introducido no es correcto. Debe elegir una tecnología de la lista mencionada")
      
@@ -316,13 +328,13 @@ elif datos == "d": # Elección valores por defecto
 
     CTM = 1
 
-    cost_area = c_A*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con el área [$]
+    CoO_area = c_A*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con el área [$]
     
     c_P = (inv/ILR) + BOS_pot
     
-    cost_pot = c_P*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con la potencia [$]
+    CoO_pot = c_P*Psys/(n*CTM*A*num_mod*G_STC) #Costes totales relacionados con la potencia [$]
     
-    CoO = cost_area + cost_pot #Cost of Ownership [$]
+    CoO = CoO_area + CoO_pot #Cost of Ownership [$]
 
 ############# WACC ########################################################################################
 
@@ -374,40 +386,57 @@ elif datos == "d": # Elección valores por defecto
 ############# INFO POR CONSOLA ########################################################################################
 
     print ("--------    --------    --------    --------    --------    --------")
-    print ("DESGLOSE DE PARÁMETROS ESCOGIDOS")
+    print ("DESGLOSE DE PARÁMETROS")
+    print ("--------    --------    --------    --------    --------    --------")
+    print("Eficiencia del módulo: ", n*100,"%")
+    print("Área del módulo: ", A, "m^2")
+    print("Número de módulos: ", num_mod, "módulos")
+    print("Potencia nominal del sistema: ", P_STC, "kW")
+    print("WACC nominal = ", WACCnom, "%")
+    print("WACC real = ", WACCreal, "%")
+    print ("Años útiles del sistema fotovoltaico a implantar: ", años, "años")
+    print("Degradación = ", round(Degr*100, 3), "%")
+    print ("Inflación anual: ", Infl*100, "%")
+
+    print ("--------    --------    --------    --------    --------    --------")
+    print ("Costes de inversión o costes fijos")
     print ("--------    --------    --------    --------    --------    --------")
 
-    print("Eficiencia del módulo: ", n*100,"%")
+    print("Coste de mano de obra, labor: ", labor, "$/W")
+    print("Otros costes de inversión: ", otros, "$/W")
     print("Coste total del módulo: ", cost_mod, "$/W")
     print("BOS estructural: ", BOS_area, "$/W")
     print("BOS eléctrico: ", BOS_pot, "$/W")
     print("Coste del inversor: ", inv, "$/W")
-    print("Costes de operación y mantenimiento anuales: ", a, "$/W al año")
-    print("P* = ", P_STC, "KWp")
-    print("WACCnom = ", WACCnom*100, "%")
-    print("Degradación = ", round(Degr*100, 3), "%")
-    print("Coste de mano de obra: ", labor, "$")
-    print("Área del módulo: ", A, "m^2")
-    print("Costes totales relacionados con el área: ", cost_area, "$")
-    print("Costes totales relacionados con la potencia: ", cost_pot, "$")    
-    print ("Inflación anual: ", Infl*100, "%")
-    print ("Años útiles del sistema fotovoltaico a implantar: ", años, "años")
-    print("Costes totales de operación y mantenimiento teniendo en cuenta el WACCreal: ", cost_oym, "$/W")
+
+    print("Costes totales relacionados con el área, CoO_area: ", CoO_area, "$/W")
+    print("Costes totales relacionados con la potencia, CoO_potencia: ", CoO_pot, "$/W")
+    print("CoO total: ", CoO_area+CoO_pot, "$/W")
+    print("Costes totales de inversión, I0: ", labor+otros+CoO_area+CoO_pot, "$/W")
+
+    print ("--------    --------    --------    --------    --------    --------")
+    print ("Costes variables o costes de operación y mantenimiento")
+    print ("--------    --------    --------    --------    --------    --------")
+
+    print("Costes de O y M del año inicial: ", a, "$/W-año")
+    print("Costes totales de O y M teniendo en cuenta el WACCreal y los años de vida: ", cost_oym, "$/W")
+
+    print ("--------    --------    --------    --------    --------    --------")
+    print ("Energía generada")
+    print ("--------    --------    --------    --------    --------    --------")
+
+    print("Performance Ratio, PR: ", PR)
     print("Irradiación anual: ", G_t, "KWh/m^2")
-    print("PR: ", PR, "%")
+
     print("Cantidad de electricidad producida anual: ", m, "KWh/año")
-    print("Cantidad total de energía producida teniendo en cuenta la degradación anual y el WACCreal: ", energ, "KWh/año")
+    print("Cantidad total de energía producida teniendo en cuenta la degradación, el WACC y los años de vida: ", energ, "KWh/año")
 
 ############# LCOE ########################################################################################
 
-    print ("----  --------  --------  --------  --------  --------  --------  ----")
     lcoe = (labor + otros + CoO + cost_oym)/energ
-    print ("labor + otros + CoO + cost_oym:", labor, "+", otros,"+", CoO,"+ (", cost_area, "+", cost_pot ,") =", labor + otros + CoO + cost_oym)
-    print ("SEGUN EL EXCEL cost_area:", cost_area +labor + otros)
-    print ("c_A, c_P:", c_A, c_P)
 
     print ("#######################################################################")
-    print("###################### Valor del LCOE:", lcoe, "$/KWh")
+    print("################ Valor del LCOE:", lcoe, "$/KWh ##########")
     print ("#######################################################################")
 
 else:
@@ -418,11 +447,11 @@ else:
 BOS = BOS_area + BOS_pot
 CoO_cost_mod = ((cost_mod)*Psys)/(n*A*num_mod*G_STC)
 CoO_BOS = (BOS*Psys)/(n*A*num_mod*G_STC)
-CoO_inv = (inv*Psys)/(n*A*num_mod*G_STC)
+CoO_inv = ((inv/ILR)*Psys)/(n*A*num_mod*G_STC)
 
-print ("---datos de la grafica-----------------------------------------------------------------")
-print ("modulo =", CoO_cost_mod, "inversor =", CoO_inv, "BOS = ", CoO_BOS,"mano_obra =",labor, "otros =",otros)
-print("suma=", CoO_cost_mod + CoO_inv + CoO_BOS + labor + otros)
+print ("---datos de la gráfica-----------------------------------------------------------------")
+print ("CoO Módulo [$/W] = ", CoO_cost_mod, ", CoO Inversor [$/W] = ", CoO_inv, ", CoO BOS [$/W] = ", CoO_BOS,", Mano de obra [$/W] = ",labor, ", otros [$/W] = ",otros)
+print("Coste de inversión [$/W] = ", CoO_cost_mod + CoO_inv + CoO_BOS + labor + otros)
 
 grupos=[nombre_inst]
 
